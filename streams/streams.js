@@ -1,15 +1,14 @@
-const fs = require('fs');
-const through = require('through2');
+const fs = require("fs");
+const { Transform } = require("readable-stream");
 
-/* Create a read stream here
-const readPoemStream = ???
-*/
+const readPoemStream = fs.createReadStream("on-joy-and-sorrow-emoji.txt", { autoClose: true });
 
-/* Create a write stream here
-const writePoemStream =
-*/
+const writePoemStream = fs.createWriteStream("on-joy-and-sorrow-updated.txt", { autoClose: true });
 
-/* EXTENSION: Create a transform stream (modify the read stream before piping to write stream)
-const transformStream = ???
-readPoemStream.pipe(transformStream).pipe(writePoemStream)
-*/
+const transformer = new Transform({
+  transform(chunk, encoding, callback) {
+    callback(null, chunk.toString().replaceAll(":)", "joy").replaceAll(":(", "sorrow"));
+  },
+});
+
+readPoemStream.pipe(transformer).pipe(writePoemStream);
